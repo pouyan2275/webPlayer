@@ -1,0 +1,72 @@
+{% extends "video/layout.html" %}
+{% block main %}
+
+<form class="form-group mt-4 p-3 bg-dark" style="border-radius:30px 30px 0 0">
+  <div class="form-group row text-center justify-content-center">
+    <div class="col d-flex flex-wrap flex-row justify-content-center">
+      <div class="p-2">
+        <label for="inputPassword" class=""><span class="navbar-brand mb-0 h1 mx-auto" style="color:#fff">Play Via
+            Link</span></label>
+      </div>
+      <div class="col-lg p-2">
+        <input type="url" class="form-control" id="link" placeholder="Paste Link Here">
+      </div>
+      <div class="p-2">
+        <button type="button" class="btn btn-primary form-control flex-fill" onclick="setLink()"><i
+            class="bi bi-play-fill"></i> Play</button>
+      </div>
+      <div class="p-2">
+        <a href="{% url 'video:watch_to_gather' %}" class="btn btn-primary form-control flex-fill"><i
+            class="bi bi-people-fill"></i> Watch to Gather</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="row justify-content-md-center mx-auto mt-3">
+  <div class="col">
+    <video id="video_tag" preload="auto" style="width: inherit;" controls src="{{movie_adress}}">
+      <track label="persian" kind="subtitles" srclang="fa" src="{{ subtitle }}" default>
+      you can't play movie
+    </video>
+  </div>
+  <div class="col-md-auto pb-3 bg-dark" style=" border-radius: 12px;">
+    <nav class="form-control bg-dark text-light text-center mt-3">
+      {% if videos %}
+      <span class="navbar-brand h-1">Movie List <span
+          class="badge rounded-pill bg-danger">{{videos.count}}</span></span>
+      {% else %}
+      <span class="navbar-brand h-1">Movie List <span class="badge rounded-pill bg-danger"></span></span>
+      {% endif %}
+    </nav>
+    <div class="d-flex flex-column mt-2">
+      {% if user.is_authenticated %}
+      <a href="/video/add_movie" class="btn btn-success mb-1">Add Movie</a>
+      {% endif %}
+      {% for video in videos %}
+      <div class="d-flex flex-row">
+        <a class="btn btn-primary mb-1 flex-fill p-2" role="button"
+          href="/video/play_via_link/{{ video.url }}?movie_id={{ video.id}}" class="">{{ video.caption }} </a>
+        <form action="{% url 'video:edit_movie_page' video.pk %}" method="get">
+          <button for="edit_button" class="p2 btn btn-info mb-1 p-2" style="margin:0 5px"> <i
+              class="bi bi-pencil-square"></i> </button>
+          <input id="edit_button" type="submit" hidden />
+        </form>
+        <form action="{% url 'video:delete_movie' %}" method="post">
+          {% csrf_token %}
+          <input type="text" name="pk" hidden value="{{ video.pk }}">
+          <button class="form-control btn btn-danger mb-1 p-2" for="delete_button"><i class="bi bi-trash"></i></button>
+          <input id="delete_button" type="submit" hidden />
+        </form>
+      </div>
+      {% endfor %}
+      {% if not user.is_authenticated %}
+      <a href="{% url 'account:signupandsignin' %}" class="btn btn-warning fw-bold">Login or Signup</a>
+      {% else %}
+      <a href="{% url 'account:logout' %}" class="btn btn-warning fw-bold">Logout <i
+          class="bi bi-box-arrow-right"></i></a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

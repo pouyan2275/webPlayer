@@ -1,0 +1,41 @@
+{% extends "video/layout.html" %}
+{% block main %}
+
+<form class="vh-100" action="{% url 'video:add_movie' %}" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="container py-4 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-dark text-white mb-5" style="border-radius: 1rem;">
+          <div class="card-body p-4 text-center">
+
+            <div class="mb-md-5 mt-md-4 pb-5">
+
+              <h2 class="fw-bold mb-4 text-uppercase">Add Movie</h2>
+
+              <div class="form-outline form-white mb-4">
+                <label class="form-label" for="caption">Caption</label>
+                <input name="caption" type="text" id="caption" class="form-control form-control-lg" />
+              </div>
+
+              <div class="form-outline form-white mb-4">
+                <label class="form-label" for="movie_link">Movie Link</label>
+                <input name="url" type="url" id="movie_link" class="form-control form-control-lg" />
+              </div>
+              <div class="form-outline form-white mb-4">
+                <label class="form-label" for="subtitle">Subtitle</label>
+                <input name="subtitle" type="file" id="subtitle" class="form-control form-control-lg" accept=".srt" />
+              </div>
+              <div class="mt-5">
+                <button class="btn btn-success btn-lg mt-1" type="submit">Add</button>
+                <a href="/video" class="btn btn-danger btn-lg mt-1">Cancel</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+{% endblock %}

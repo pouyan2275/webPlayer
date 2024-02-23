@@ -1,0 +1,43 @@
+{% extends "video/layout.html" %}
+{% block main %}
+<div class="row justify-content-md-center mx-auto mt-3">
+    <div class="col">
+        <button id="mute" type="button" onclick="mute_un_mute()">Mute/Unmute</button>
+        <button id="fs" type="button" data-state="go-fullscreen">Fullscreen</button>
+        <button id="fs" type="button" data-state="go-fullscreen">Play/Pause</button>
+        <video id="video_tag" muted controls style="width: inherit;" src="{{url}}">
+            <track label="persian" kind="subtitles" srclang="fa" src="{{ subtitle }}" default>
+            you can't play movie
+        </video>
+            
+     
+</div>
+<style>
+ 
+</style>
+<script>
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    var videoSocket = new WebSocket(
+		ws_scheme
+        +'://'
+        + location.host
+        + location.pathname
+        +'/'
+    )
+	console.log(videoSocket)
+    videoSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if(data.command == 'play'){
+            video_tag.play()
+            video_tag.currentTime = data.time + 1
+        }else if(data.command == 'pause'){
+            video_tag.pause()
+            video_tag.currentTime = data.time + 1
+        }else if(data.command == 'url'){
+            video_tag.src = data.url
+            video_tag.currentTime = 0
+        }
+            
+    };
+</script>
+{% endblock %}

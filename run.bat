@@ -1,0 +1,1 @@
+.\venv\Scripts\python.exe .\webPlayer\manage.py runserver 0.0.0.0:80

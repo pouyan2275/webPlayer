@@ -1,0 +1,97 @@
+{% extends "video/layout.html" %}
+{% block main %}
+<form action="{% url 'video:save_url' %}" class="form-group mt-4 p-3 bg-dark" style="border-radius:30px 30px 0 0" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group row text-center justify-content-center">
+        <div class="col d-flex flex-wrap flex-row justify-content-center">
+            <div class="p-2">
+                <label for="inputPassword" class=""><span class="navbar-brand mb-0 h1 mx-auto" style="color:#fff">Play
+                        Via Link</span></label>
+            </div>
+            <div class="col-lg p-2">
+                <input type="url" name="url" class="form-control" id="link" placeholder="Paste Link Here" value="{{ url }}">
+            </div>
+            <div class="p-2">
+                <button type="submit" class="btn btn-primary form-control flex-fill" onclick="play_movie()"><i
+                        class="bi bi-play-fill"></i> Play</button>
+            </div>
+            <div class="p-2">
+                <input type="button" class="btn btn-primary form-control flex-fill" value="Subtitle" onclick="document.getElementById('file').click();">
+                <input type="file" name="subtitle" id="file" style="display:none;" accept=".srt">
+            </div>
+            <div class="p-2">
+                <a href="{% url 'video:home' %}" class="btn btn-primary form-control flex-fill"><i
+                        class="bi bi-person-fill"></i> Watch Solo</a>
+            </div>
+        </div>
+        <label class="text-white" onclick="copy_to_clipboard()" for="my_page">share this link to your friends: </label>
+        <input type="url" onclick="copy_to_clipboard()" readonly id="my_page"
+            class="text-center border-0 bg-dark text-primary" value="{{ host }}{% url 'video:watching' user.id %}">
+    </div>
+</form>
+
+<div class="row justify-content-md-center mx-auto mt-3">
+    <div class="col">
+        <video id="video_tag" preload="auto" style="width: inherit;" controls src="{{url}}">
+            <track label="persian" kind="subtitles" srclang="fa" src="{{ subtitle }}" default>
+            you can't play movie
+        </video>
+    </div>
+</div>
+<style>
+#my_page{
+    cursor: pointer;
+}
+#my_page:focus {outline:none!important;}
+</style>
+<script>
+    video_tag.onplay = function(e){
+        movie_control('play')
+    }
+    video_tag.onpause = (e) =>{
+        movie_control('pause')
+    }
+
+    function movie_control(command){
+        videoSocket.send(JSON.stringify({
+            'command': command,
+            'time': video_tag.currentTime,
+            'id': '{{user.id}}'
+        }));
+    }
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    const videoSocket = new WebSocket(
+        ws_scheme
+        +'://'
+        + window.location.host
+        + '/video/watch_to_gather/'
+    );
+    videoSocket.onclose = function(e) {
+            console.error('socket closed unexpectedly');
+    };
+
+    function jump_to_location(time) {
+            videoSocket.send(JSON.stringify({
+                'time': time
+            }));
+    }
+    function copy_to_clipboard() {
+        /* Get the text field */
+        var copyText = document.getElementById("my_page");
+
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /* For mobile devices */
+        /* Copy the text inside the text field */
+        navigator.clipboard.writeText(copyText.value);
+
+        /* Alert the copied text */
+        alert("Copied the text: " + copyText.value);
+    }
+    function play_movie() {
+        setLink()
+    }
+
+    
+</script>
+{% endblock %}
